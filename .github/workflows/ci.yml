@@ -8,7 +8,7 @@ jobs:
     name: Build & Push to repository
     runs-on: ubuntu-latest
     env:
-      IMG_NAME: yono1997/poc-table-excel
+      IMG_NAME: yonodocker97/poc-table-excel
       TAGS: ${GITHUB_REF##*/}
     steps:
       - uses: actions/checkout@v3
@@ -16,6 +16,6 @@ jobs:
 
       - name: Build and Push image
         run: |
-          echo "mamangsekayu97" | docker login -u "msuryono0@gmail.com" --password-stdin
+          echo "mamangsekayu97" | docker login -u "yonodocker97" --password-stdin
           docker image build -t ${{ env.IMG_NAME }}:${{ env.TAGS }} .
           docker push ${{ env.IMG_NAME }}:${{ env.TAGS }}
