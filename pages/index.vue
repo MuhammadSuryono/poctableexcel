@@ -9,6 +9,7 @@ const dataRow = computed((): Map<string, DataRow> => $store.quotationFabric.data
 const grandTotal = computed((): Map<string, DataRow> => $store.quotationFabric.grandTotal);
 
 const indexRowSelected = ref<string | null>(null);
+const shiftIsActive = ref<boolean>(false);
 const isModalVisisble = ref<boolean>(false);
 const alreadyCopied = ref<boolean>(false);
 const optionCopyPasteRow = ref<{
@@ -18,6 +19,8 @@ const optionCopyPasteRow = ref<{
   position: "After",
   numberOfRow: 1
 })
+const moreThanOneRowSelected = ref<string[]>([]);
+const moreThanOneRowColumSelected = ref<number | null>(null);
 //
 //
 // Function to copy selected cells
@@ -54,16 +57,26 @@ const updateItem = (index:number, key: string, value: any) => {
 //
 // // const clickedNumber = ref(0);
 const onClickRow = (index: string) => {
-  if (index !== indexRowSelected.value) {
-    document.querySelectorAll('tbody tr.selected').forEach(row => {
+  if (!shiftIsActive.value) {
+    document.querySelectorAll('tbody tr td.selected').forEach(row => {
       // Menghapus class 'selected' dari setiap elemen <tr>
       row.classList.remove('selected');
     });
+    if (index !== indexRowSelected.value) {
+      document.querySelectorAll('tbody tr.selected').forEach(row => {
+        // Menghapus class 'selected' dari setiap elemen <tr>
+        row.classList.remove('selected');
+      });
+    }
 
+    $store.quotationFabric.setSelectedRow(index)
+    indexRowSelected.value = index;
   }
 
-  $store.quotationFabric.setSelectedRow(index)
-  indexRowSelected.value = index;
+  if (shiftIsActive.value) {
+    $store.quotationFabric.clearRowSelected(index)
+    indexRowSelected.value = null;
+  }
 }
 const formatCurrency = (value, locale = 'en-US', currency = 'USD') => {
   return new Intl.NumberFormat(locale, {
@@ -73,26 +86,45 @@ const formatCurrency = (value, locale = 'en-US', currency = 'USD') => {
 }
 //
 onMounted(() => {
-  // Copy functionality on Ctrl + C
-  document.addEventListener('keydown', function(event) {
-    if (event.ctrlKey && event.key === 'c') {
-      copySelectedCells();
-    }
-  });
 
 // Paste functionality on Ctrl + V
   document.addEventListener('keydown', function(event) {
     if (event.ctrlKey && event.key === 'v') {
       pasteCopiedData();
     }
-  });
-
-// Paste functionality on Ctrl + V
-  document.addEventListener('keydown', function(event) {
+    if (event.ctrlKey && event.key === 'c') {
+      copySelectedCells();
+    }
     if (event.key === 'Delete') {
       $store.quotationFabric.delete(indexRowSelected.value)
       indexRowSelected.value = null
     }
+    if (event.key === 'Control') {
+      shiftIsActive.value = true;
+    }
+  });
+  document.addEventListener('keyup', function(event) {
+    if (event.key === 'Control') {
+      shiftIsActive.value = false;
+      moreThanOneRowColumSelected.value = [];
+      moreThanOneRowColumSelected.value = null;
+    }
+  });
+  document.querySelectorAll('tbody tr td').forEach(cell => {
+    cell.addEventListener('click', function() {
+      const keys = [...dataRow.value.keys()];
+      if (shiftIsActive.value) {
+        let rowArray = new Set(moreThanOneRowSelected.value);
+        // Mendapatkan baris dan kolom dari sel yang diklik
+        const rowIndex = this.parentNode.rowIndex; // Indeks baris
+        const cellIndex = this.cellIndex;          // Indeks kolom
+
+        rowArray.add(keys[rowIndex - 1])
+        moreThanOneRowColumSelected.value = cellIndex;
+        moreThanOneRowSelected.value = [...rowArray]
+        this.classList.toggle('selected');
+      }
+    });
   });
 })
 </script>
@@ -119,10 +151,13 @@ onMounted(() => {
       <tbody>
       <tr v-for="(value, key) in dataRow" :key="key" @click="onClickRow(value[0])" :class="{'selected': value[1].isSelected}">
         <td class="border border-black px-2 py-2 text-center hover:cursor-no-drop bg-gray-200">{{key+1}}</td>
-        <td class="border border-black px-4 py-2 hover:cursor-cell">{{value[1].item.value}}</td>
-        <td class="border border-black px-4 py-2 truncate w-[10%] hover:cursor-cell">{{value[1].description.value}}</td>
+        <td class="border border-black px-2 py-2 hover:cursor-cell w-[10%]">{{value[1].item.value}}</td>
+        <td class="border border-black px-2 py-2 truncate w-[20%] hover:cursor-cell text-wrap">{{value[1].description.value}}</td>
         <td class="border border-black px-3 py-2 hover:cursor-cell">{{value[1].image.value}}</td>
-        <td class="border border-black px-4 py-2 text-center hover:cursor-cell" contenteditable="true" @input="updateItem(value[0], 'qty', $event.target.innerText)">{{value[1].qty.value}}</td>
+        <td class="border border-black px-4 py-2 text-center hover:cursor-cell" contenteditable="true"
+            @input="updateItem(value[0], 'qty', $event.target.innerText)">
+          {{value[1].qty.value}}
+        </td>
         <td class="border border-black px-4 py-2 text-center hover:cursor-cell">{{value[1].unit.value}}</td>
         <td class="border border-black px-4 py-2">
           <div class="flex justify-end">
@@ -136,7 +171,9 @@ onMounted(() => {
             <span>{{formatCurrency(value[1].totalCost.value, 'id-ID', 'IDR')}}</span>
           </div>
         </td>
-        <td class="border border-black px-4 py-2 truncate w-[20%]">{{value[1].remarks.value}}</td>
+        <td class="border border-black px-4 py-2 truncate w-[20%] text-wrap">
+          {{value[1].remarks.value}}
+        </td>
       </tr>
       </tbody>
       <tfoot>

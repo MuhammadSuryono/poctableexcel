@@ -18,7 +18,10 @@ export interface DataRow {
     totalCost: DataConfigColumn;
     remarks: DataConfigColumn;
     isSelected: boolean;
-    id: string;
+    id?: string;
+    isParentRowGroup?: boolean;
+    dataRowGroup?: DataRow[] | null;
+    fieldParentRowGroup?: string | null;
 }
 
 export interface DataDelete {

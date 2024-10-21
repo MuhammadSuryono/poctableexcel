@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 export default function actions(): _ActionsTree {
     return {
         setSelectedRow(id:string) {
-            console.log(id)
             let dt = this.dataRow as Map<string, DataRow>;
             dt.forEach(e => e.isSelected = false)
             dt.get(id).isSelected = true;
@@ -37,7 +36,6 @@ export default function actions(): _ActionsTree {
             dataSelected.id = uuidv4()
             let newMap : Map<string, DataRow> = new Map();
             let index = 0;
-            console.log(start)
             for (let [key, value] of dt) {
                 if (index === start) {
                     newMap.set(uuidv4(), dataSelected);
