@@ -20,3 +20,8 @@ export interface DataRow {
     isSelected: boolean;
     id: string;
 }
+
+export interface DataDelete {
+    index: number;
+    data: Map<string, DataRow>
+}

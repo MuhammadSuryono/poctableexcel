@@ -39,7 +39,7 @@ const pasteCopiedData = () => {
 }
 //
 const confirmCopiedData = () => {
-  if (optionCopyPasteRow.value.position === "Before") {
+  if (optionCopyPasteRow.value.position === 'Before' || dataRow.value.size === optionCopyPasteRow.value.numberOfRow) {
     optionCopyPasteRow.value.numberOfRow -= 1;
   }
   $store.quotationFabric.copyData(optionCopyPasteRow.value.numberOfRow, indexRowSelected.value);
@@ -84,6 +84,14 @@ onMounted(() => {
   document.addEventListener('keydown', function(event) {
     if (event.ctrlKey && event.key === 'v') {
       pasteCopiedData();
+    }
+  });
+
+// Paste functionality on Ctrl + V
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Delete') {
+      $store.quotationFabric.delete(indexRowSelected.value)
+      indexRowSelected.value = null
     }
   });
 })

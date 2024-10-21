@@ -1,9 +1,10 @@
-import type {DataRow} from "~/types/quotation/fabric";
+import type {DataDelete, DataRow} from "~/types/quotation/fabric";
 import { v4 as uuidv4 } from 'uuid';
 
 export interface RootState {
     dataRow: Map<string, DataRow>;
     grandTotal: number;
+    dataDelete?: DataDelete[]
 }
 
 export const createState = (): Partial<RootState> => {

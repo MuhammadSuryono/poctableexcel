@@ -20,13 +20,24 @@ export default function actions(): _ActionsTree {
                 dataRow: dt
             })
         },
+        delete(index: string) {
+            let dt = this.dataRow as Map<string, DataRow>;
+            dt.delete(index)
+
+            let grandTotal = 0;
+            dt.forEach(value => grandTotal += value.totalCost.value)
+            this.$patch({
+                dataRow: dt,
+                grandTotal: grandTotal
+            })
+        },
         copyData(start: number, indexDataCopy: string) {
             let dt = this.dataRow as Map<string, DataRow>;
             const dataSelected = JSON.parse(JSON.stringify(dt.get(indexDataCopy) as DataRow));
             dataSelected.id = uuidv4()
             let newMap : Map<string, DataRow> = new Map();
-            console.log(start);
             let index = 0;
+            console.log(start)
             for (let [key, value] of dt) {
                 if (index === start) {
                     newMap.set(uuidv4(), dataSelected);
@@ -34,8 +45,11 @@ export default function actions(): _ActionsTree {
                 newMap.set(key, value);
                 index++;
             }
+            let grandTotal = 0;
+            newMap.forEach(value => grandTotal += value.totalCost.value)
             this.$patch({
-                dataRow: newMap
+                dataRow: newMap,
+                grandTotal: grandTotal
             })
         },
         deepCopy(obj: any) {
@@ -50,8 +64,11 @@ export default function actions(): _ActionsTree {
             }
             dt.set(index, dataSelected)
 
+            let grandTotal = 0;
+            dt.forEach(value => grandTotal += value.totalCost.value)
             this.$patch({
-                dataRow: dt
+                dataRow: dt,
+                grandTotal: grandTotal
             })
         }
     }
