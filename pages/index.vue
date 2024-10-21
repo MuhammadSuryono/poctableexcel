@@ -5,9 +5,10 @@ import type {DataRow} from "~/types/quotation/fabric";
 const {$store} = useNuxtApp();
 const copiedData = ref<any[]|null>([]);
 
-const dataRow = computed((): DataRow[] => $store.quotationFabric.dataRow);
+const dataRow = computed((): Map<string, DataRow> => $store.quotationFabric.dataRow);
+const grandTotal = computed((): Map<string, DataRow> => $store.quotationFabric.grandTotal);
 
-const indexRowSelected = ref<number | null>(null);
+const indexRowSelected = ref<string | null>(null);
 const isModalVisisble = ref<boolean>(false);
 const alreadyCopied = ref<boolean>(false);
 const optionCopyPasteRow = ref<{
@@ -17,34 +18,17 @@ const optionCopyPasteRow = ref<{
   position: "After",
   numberOfRow: 1
 })
-
-
+//
+//
 // Function to copy selected cells
 const copySelectedCells = () => {
-  // const selectedCells = document.querySelectorAll('.selected');
-  // copiedData.value = [];
-
-  // Store the data of selected cells
-  // selectedCells.forEach(cell => {
-  //   copiedData.value.push(cell.textContent);
-  // });
-
   // Log copied data for debugging
   if (indexRowSelected.value !== null) {
     alreadyCopied.value = true;
   }
-  console.log('Copied Data:', copiedData);
 }
-
+//
 const pasteCopiedData = () => {
-  // const table = document.getElementById('tableQuotation').getElementsByTagName('tbody')[0];
-  // const newRow = table.insertRow();  // Insert new row
-  //
-  // copiedData.value?.forEach(data => {
-  //   const newCell = newRow.insertCell();
-  //   newCell.textContent = data;
-  //   newCell.contentEditable = "true"; // Make cells editable like the original table
-  // });
   if (indexRowSelected.value !== null) {
     isModalVisisble.value = true;
     alreadyCopied.value = false;
@@ -53,36 +37,24 @@ const pasteCopiedData = () => {
   // Log for debugging
   console.log('Data pasted');
 }
-
+//
 const confirmCopiedData = () => {
-  const dataSelected = dataRow.value.at(indexRowSelected.value);
-  const dataFromState = dataRow.value;
   if (optionCopyPasteRow.value.position === "Before") {
     optionCopyPasteRow.value.numberOfRow -= 1;
   }
-  dataFromState.splice(optionCopyPasteRow.value.numberOfRow, 0, dataSelected);
-  dataRow.value = dataFromState;
-  // dataRow.value.forEach((item, index) => {
-  //   item.no.value = index + 1
-  // })
+  $store.quotationFabric.copyData(optionCopyPasteRow.value.numberOfRow, indexRowSelected.value);
   isModalVisisble.value = false;
   indexRowSelected.value = null;
-  document.querySelectorAll('tbody tr.selected').forEach(row => {
-    // Menghapus class 'selected' dari setiap elemen <tr>
-    row.classList.remove('selected');
-  });
+  $store.quotationFabric.clearRowSelected();
 }
 
 const updateItem = (index:number, key: string, value: any) => {
-  dataRow.value[index][key].value = value;
-  console.log(index, key);
+  $store.quotationFabric.updateItem(index, key, value);
 }
-
-// const clickedNumber = ref(0);
-const onClickRow = (index: number) => {
-  $store.quotationFabric.setSelectedRow(index)
+//
+// // const clickedNumber = ref(0);
+const onClickRow = (index: string) => {
   if (index !== indexRowSelected.value) {
-
     document.querySelectorAll('tbody tr.selected').forEach(row => {
       // Menghapus class 'selected' dari setiap elemen <tr>
       row.classList.remove('selected');
@@ -90,12 +62,16 @@ const onClickRow = (index: number) => {
 
   }
 
-  dataRow.value.forEach(e => e.isSelected = false)
-  dataRow.value[index].isSelected = true;
+  $store.quotationFabric.setSelectedRow(index)
   indexRowSelected.value = index;
-  console.log(dataRow.value[index])
 }
-
+const formatCurrency = (value, locale = 'en-US', currency = 'USD') => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value);
+}
+//
 onMounted(() => {
   // Copy functionality on Ctrl + C
   document.addEventListener('keydown', function(event) {
@@ -133,39 +109,27 @@ onMounted(() => {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(dt, i) in dataRow" :key="dt.no" @click="onClickRow(i)" :class="{'selected': dt.isSelected}">
-        <td class="border border-black px-2 py-2 text-center hover:cursor-no-drop bg-gray-200">{{i+1}}</td>
-        <td class="border border-black px-4 py-2 hover:cursor-cell">{{dt.item.value}}</td>
-        <td class="border border-black px-4 py-2 truncate w-[10%] hover:cursor-cell">{{dt.description.value}}</td>
-        <td class="border border-black px-3 py-2 hover:cursor-cell">{{dt.image.value}}</td>
-        <td class="border border-black px-4 py-2 text-center hover:cursor-cell" contenteditable="true" @input="updateItem(i, 'qty', $event.target.innerText)">{{dt.qty.value}}</td>
-        <td class="border border-black px-4 py-2 text-center hover:cursor-cell">{{dt.unit.value}}</td>
+      <tr v-for="(value, key) in dataRow" :key="key" @click="onClickRow(value[0])" :class="{'selected': value[1].isSelected}">
+        <td class="border border-black px-2 py-2 text-center hover:cursor-no-drop bg-gray-200">{{key+1}}</td>
+        <td class="border border-black px-4 py-2 hover:cursor-cell">{{value[1].item.value}}</td>
+        <td class="border border-black px-4 py-2 truncate w-[10%] hover:cursor-cell">{{value[1].description.value}}</td>
+        <td class="border border-black px-3 py-2 hover:cursor-cell">{{value[1].image.value}}</td>
+        <td class="border border-black px-4 py-2 text-center hover:cursor-cell" contenteditable="true" @input="updateItem(value[0], 'qty', $event.target.innerText)">{{value[1].qty.value}}</td>
+        <td class="border border-black px-4 py-2 text-center hover:cursor-cell">{{value[1].unit.value}}</td>
         <td class="border border-black px-4 py-2">
-          <div class="flex justify-between">
-            <span>Rp</span>
-            <span>{{dt.unitCost.value}}</span>
+          <div class="flex justify-end">
+<!--            <span>Rp</span>-->
+            <span>{{formatCurrency(value[1].unitCost.value, 'id-ID', 'IDR')}}</span>
           </div>
         </td>
         <td class="border border-black px-4 py-2">
-          <div class="flex justify-between">
-            <span>Rp</span>
-            <span>{{dt.totalCost.value}}</span>
+          <div class="flex justify-end">
+<!--            <span>Rp</span>-->
+            <span>{{formatCurrency(value[1].totalCost.value, 'id-ID', 'IDR')}}</span>
           </div>
         </td>
-        <td class="border border-black px-4 py-2 truncate w-[20%]">{{dt.remarks.value}}</td>
+        <td class="border border-black px-4 py-2 truncate w-[20%]">{{value[1].remarks.value}}</td>
       </tr>
-<!--      <tr>-->
-<!--        <td contenteditable="true">John</td>-->
-<!--        <td contenteditable="true">25</td>-->
-<!--      </tr>-->
-<!--      <tr>-->
-<!--        <td contenteditable="true">Jane</td>-->
-<!--        <td contenteditable="true">30</td>-->
-<!--      </tr>-->
-<!--      <tr>-->
-<!--        <td contenteditable="true">Doe</td>-->
-<!--        <td contenteditable="true">35</td>-->
-<!--      </tr>-->
       </tbody>
       <tfoot>
       <tr>
@@ -173,7 +137,7 @@ onMounted(() => {
         <td class="py-2 px-2 font-bold text-justify border border-black">
           <div class="flex justify-between">
             <span class="font-semibold">IDR</span>
-            <span class="font-semibold">0</span>
+            <span class="font-semibold">{{formatCurrency(grandTotal, 'id-ID', 'IDR')}}</span>
           </div>
         </td>
       </tr>

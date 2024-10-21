@@ -18,4 +18,5 @@ export interface DataRow {
     totalCost: DataConfigColumn;
     remarks: DataConfigColumn;
     isSelected: boolean;
+    id: string;
 }
