@@ -5,7 +5,7 @@ import Navbar from "~/components/layout/Navbar.vue";
 
 <template>
   <div>
-    <Navbar />
+<!--    <Navbar />-->
     <div class="mx-2xl mt-3 w-full items-center container">
       <slot/>
     </div>

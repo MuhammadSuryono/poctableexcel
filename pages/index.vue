@@ -101,7 +101,7 @@ onMounted(() => {
   <div>
     <QuotationHeader />
   </div>
-  <div class="flex flex-row items-center text-[9pt]">
+  <div class="flex flex-col items-start text-[9pt]">
     <table id="tableQuotation" class="table-auto w-full border border-collapse border-black">
       <thead>
       <tr>
@@ -151,6 +151,26 @@ onMounted(() => {
       </tr>
       </tfoot>
     </table>
+    <div class="flex flex-col mt-3">
+      <span class="font-semibold">NOTE :</span>
+      <ul class="list-disc ml-5">
+        <li>Above the price include VAT 11%</li>
+        <li>Payment Terms :
+          <ul>
+            <li>Fabric : DP 50% - 50% Seatlement After Delivery</li>
+          </ul>
+        </li>
+        <li>Account Bank Details:</li>
+        <li>Nama Bank : <span class="font-semibold">BANK CENTRAL ASIA</span></li>
+        <li>Address : KCU Cipete Blok A Jakarta </li>
+        <li>Acc. Namek : <span class="font-semibold">PT. Amardeep Indo Sakti</span></li>
+        <li>Acc. No : 2183023914</li>
+        <li>Swift Code : <span class="font-semibold">CENAIDJA</span></li>
+        <li>For the documents of tax invoices (Faktur Pajak), receipts and other invoices will be issued after we receive the payment</li>
+        <li>We will order all the items above after receiving  Down Payment & PO, and the delivery will be confirmed subject to availability of goods from factory</li>
+        <li>Validity time period of this quotation only 3 days from the date above</li>
+      </ul>
+    </div>
     <GeneralModal :is-visible="isModalVisisble" title="Copy Row" @onClose="(v: boolean) => isModalVisisble = v">
       <div class="flex flex-col gap-2">
         <div class="mb-4">
