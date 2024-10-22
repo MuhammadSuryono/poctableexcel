@@ -98,8 +98,17 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col">
     <QuotationHeader />
+    <div class="border my-4 px-3 py-1 border-gray-500 w-full text-[11px] no-print shadow-lg">
+      <div class="flex flex-col w-fit border py-1 px-2 rounded-md cursor-pointer hover:bg-gray-200 border-gray-500">
+        <span>Divider</span>
+        <span class="rounded-xl px-2 py-1 bg-yellow-300"></span>
+      </div>
+    </div>
+  </div>
+  <div class="flex mt-2 bg-biru-100 w-full text-white p-3 font-semibold">
+    DICKSON  Fabrics - Stock Per 02/10/2024
   </div>
   <div class="flex flex-col items-start text-[9pt]">
     <table id="tableQuotation" class="table-auto w-full border border-collapse border-black">
@@ -117,7 +126,7 @@ onMounted(() => {
       </tr>
       </thead>
       <tbody>
-      <tr v-for="(value, key) in dataRow" :key="key" @click="onClickRow(value[0])" :class="{'selected': value[1].isSelected}">
+      <tr v-for="(value, key) in dataRow" :key="key" @click="onClickRow(value[0])" :class="{'selected': value[1].isSelected, 'bg-yellow-300': value[1].divider}">
         <td class="border border-black px-2 py-2 text-center hover:cursor-no-drop bg-gray-200">{{key+1}}</td>
         <td class="border border-black px-4 py-2 hover:cursor-cell">{{value[1].item.value}}</td>
         <td class="border border-black px-4 py-2 truncate w-[10%] hover:cursor-cell">{{value[1].description.value}}</td>
@@ -205,5 +214,10 @@ table {
 **/
 .selected {
   border: 2px solid red;
+}
+@media print {
+  .no-print {
+    display: none;
+  }
 }
 </style>

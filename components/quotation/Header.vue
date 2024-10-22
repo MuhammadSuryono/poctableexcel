@@ -26,9 +26,6 @@
       Telp. 0361-288009 Attn. Bpk Chandra
     </span>
   </div>
-  <div class="flex mt-2 bg-biru-100 w-full text-white p-3 font-semibold">
-    DICKSON  Fabrics - Stock Per 02/10/2024
-  </div>
 </template>
 
 <style scoped>

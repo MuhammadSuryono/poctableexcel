@@ -56,7 +56,8 @@ export const createState = (): Partial<RootState> => {
             value: "Ready Jakarta 6-7 wokring days delivery",
             indexCol: 8
         },
-        id: uuidv4()
+        id: uuidv4(),
+        divider: false
     })
     dataFabric.set(uuidv4(), {
         isSelected: false,
@@ -105,7 +106,8 @@ export const createState = (): Partial<RootState> => {
             value: "Ready Jakarta 6-7 wokring days delivery",
             indexCol: 8
         },
-        id: uuidv4()
+        id: uuidv4(),
+        divider: false
     })
 
     let grandTotal = 0;

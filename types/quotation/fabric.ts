@@ -19,6 +19,7 @@ export interface DataRow {
     remarks: DataConfigColumn;
     isSelected: boolean;
     id: string;
+    divider: boolean;
 }
 
 export interface DataDelete {

@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 export default function actions(): _ActionsTree {
     return {
         setSelectedRow(id:string) {
-            console.log(id)
             let dt = this.dataRow as Map<string, DataRow>;
             dt.forEach(e => e.isSelected = false)
             dt.get(id).isSelected = true;
