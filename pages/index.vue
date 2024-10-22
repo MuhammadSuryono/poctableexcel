@@ -3,7 +3,6 @@
 import type {DataRow} from "~/types/quotation/fabric";
 
 const {$store} = useNuxtApp();
-const copiedData = ref<any[]|null>([]);
 
 const dataRow = computed((): Map<string, DataRow> => $store.quotationFabric.dataRow);
 const grandTotal = computed((): Map<string, DataRow> => $store.quotationFabric.grandTotal);
@@ -47,10 +46,6 @@ const confirmCopiedData = () => {
   indexRowSelected.value = null;
   $store.quotationFabric.clearRowSelected();
 }
-
-const updateItem = (index:number, key: string, value: any) => {
-  $store.quotationFabric.updateItem(index, key, value);
-}
 //
 // // const clickedNumber = ref(0);
 const onClickRow = (index: string) => {
@@ -64,12 +59,6 @@ const onClickRow = (index: string) => {
 
   $store.quotationFabric.setSelectedRow(index)
   indexRowSelected.value = index;
-}
-const formatCurrency = (value, locale = 'en-US', currency = 'USD') => {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: currency,
-  }).format(value);
 }
 //
 onMounted(() => {
@@ -95,17 +84,19 @@ onMounted(() => {
     }
   });
 })
+
+const formatCurrency = (value, locale = 'en-US', currency = 'USD') => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value);
+}
 </script>
 
 <template>
   <div class="flex flex-col">
     <QuotationHeader />
-    <div class="border my-4 px-3 py-1 border-gray-500 w-full text-[11px] no-print shadow-lg">
-      <div class="flex flex-col w-fit border py-1 px-2 rounded-md cursor-pointer hover:bg-gray-200 border-gray-500">
-        <span>Divider</span>
-        <span class="rounded-xl px-2 py-1 bg-yellow-300"></span>
-      </div>
-    </div>
+    <GeneralConfigProperties />
   </div>
   <div class="flex mt-2 bg-biru-100 w-full text-white p-3 font-semibold">
     DICKSON  Fabrics - Stock Per 02/10/2024
@@ -128,24 +119,8 @@ onMounted(() => {
       <tbody>
       <tr v-for="(value, key) in dataRow" :key="key" @click="onClickRow(value[0])" :class="{'selected': value[1].isSelected, 'bg-yellow-300': value[1].divider}">
         <td class="border border-black px-2 py-2 text-center hover:cursor-no-drop bg-gray-200">{{key+1}}</td>
-        <td class="border border-black px-4 py-2 hover:cursor-cell">{{value[1].item.value}}</td>
-        <td class="border border-black px-4 py-2 truncate w-[10%] hover:cursor-cell">{{value[1].description.value}}</td>
-        <td class="border border-black px-3 py-2 hover:cursor-cell">{{value[1].image.value}}</td>
-        <td class="border border-black px-4 py-2 text-center hover:cursor-cell" contenteditable="true" @input="updateItem(value[0], 'qty', $event.target.innerText)">{{value[1].qty.value}}</td>
-        <td class="border border-black px-4 py-2 text-center hover:cursor-cell">{{value[1].unit.value}}</td>
-        <td class="border border-black px-4 py-2">
-          <div class="flex justify-end">
-<!--            <span>Rp</span>-->
-            <span>{{formatCurrency(value[1].unitCost.value, 'id-ID', 'IDR')}}</span>
-          </div>
-        </td>
-        <td class="border border-black px-4 py-2">
-          <div class="flex justify-end">
-<!--            <span>Rp</span>-->
-            <span>{{formatCurrency(value[1].totalCost.value, 'id-ID', 'IDR')}}</span>
-          </div>
-        </td>
-        <td class="border border-black px-4 py-2 truncate w-[20%]">{{value[1].remarks.value}}</td>
+        <QuotationFabricRowTable :key-row="key" :value="value" v-if="!value[1].divider" />
+        <td class="bg-yellow-300" colspan="8" v-if="value[1].divider"></td>
       </tr>
       </tbody>
       <tfoot>

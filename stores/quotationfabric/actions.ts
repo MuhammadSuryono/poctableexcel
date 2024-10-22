@@ -36,12 +36,14 @@ export default function actions(): _ActionsTree {
             dataSelected.id = uuidv4()
             let newMap : Map<string, DataRow> = new Map();
             let index = 0;
-            console.log(start)
             for (let [key, value] of dt) {
-                if (index === start) {
+                if (index === start && start !== (dt.size - 1)) {
                     newMap.set(uuidv4(), dataSelected);
                 }
                 newMap.set(key, value);
+                if (index === start && start === (dt.size - 1)) {
+                    newMap.set(uuidv4(), dataSelected);
+                }
                 index++;
             }
             let grandTotal = 0;
@@ -49,6 +51,74 @@ export default function actions(): _ActionsTree {
             this.$patch({
                 dataRow: newMap,
                 grandTotal: grandTotal
+            })
+        },
+        addDivider(start: number) {
+            let dt = this.dataRow as Map<string, DataRow>;
+            const dataSelected : DataRow = {
+                isSelected: false,
+                no: {
+                    type: "numeric",
+                    value: 1,
+                    indexCol: 0
+                },
+                item: {
+                    type: "string",
+                    value: " ",
+                    indexCol: 1
+                },
+                description: {
+                    type: "string",
+                    value: "",
+                    indexCol: 2
+                },
+                image: {
+                    type: "string",
+                    value: "",
+                    indexCol: 3
+                },
+                qty: {
+                    type: "numeric",
+                    value: 0,
+                    indexCol: 4
+                },
+                unit: {
+                    type: "string",
+                    value: "",
+                    indexCol: 5
+                },
+                unitCost: {
+                    type: "numeric",
+                    value: 0,
+                    indexCol: 6
+                },
+                totalCost: {
+                    type: "numeric",
+                    value: 0,
+                    indexCol: 7
+                },
+                remarks: {
+                    type: "string",
+                    value: "",
+                    indexCol: 8
+                },
+                id: uuidv4(),
+                divider: true
+            };
+            let newMap : Map<string, DataRow> = new Map();
+            let index = 0;
+            for (let [key, value] of dt) {
+                if (index === start && start !== (dt.size - 1)) {
+                    newMap.set(uuidv4(), dataSelected);
+                }
+                newMap.set(key, value);
+                if (index === start && start === (dt.size - 1)) {
+                    newMap.set(uuidv4(), dataSelected);
+                }
+                index++;
+            }
+            this.$patch({
+                dataRow: newMap,
             })
         },
         deepCopy(obj: any) {
