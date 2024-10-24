@@ -4,6 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   app: {
     head: {
+      title: "Quotation",
       "meta": [
         {
           "name": "viewport",
@@ -12,6 +13,9 @@ export default defineNuxtConfig({
         {
           "charset": "utf-8"
         }
+      ],
+      link: [
+        {rel: 'icon', type: 'image/png', href: 'https://www.amardeepfabrics.com/Admin/Public/GetImage.ashx?height=55&crop=5&Compression=75&image=%2fFiles%2fImages%2fAmardeep_Logo.png'}
       ]
     },
     layoutTransition: { name: "fade-layout", mode: "out-in" },
